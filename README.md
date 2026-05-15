@@ -1,6 +1,6 @@
 # hyprmon
 
-A Hyprland-style desktop widget for macOS. Live CPU, RAM, battery, top-5 processes, and Claude Code usage (5-hour and weekly rolling windows) rendered on a non-intrusive glass panel that lives behind your windows.
+A macOS menubar widget showing live CPU, RAM, battery, top-5 processes, and Claude Code usage (5-hour and weekly rolling windows). Click the chart icon in the menubar to toggle a glass popover with all metrics.
 
 ![screenshot placeholder — add after first build](docs/screenshot.png)
 
@@ -30,14 +30,13 @@ open ./build/Hyprmon.app
 
 ## Configuration
 
-Configuration lives in `~/.config/hyprmon/config.toml`. The file is created with sensible defaults on first run. Edits are picked up live except for `corner` and `margin`.
+Configuration lives in `~/.config/hyprmon/config.toml`. The file is created with sensible defaults on first run. Edits are picked up live.
 
 See [`examples/config.toml`](examples/config.toml) for the full schema.
 
 Common tweaks:
 
 ```toml
-corner  = "bottom-right"
 opacity = 0.7
 accent  = "#F7768E"
 

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-05-15
+
+### Changed
+- **Replaced desktop-level panel with a menubar item.** The widget now lives in the macOS menubar as a small chart icon; click it to toggle a popover with all metrics. The previous desktop-level NSPanel was useless because windows kept covering it.
+
+### Removed
+- `corner` and `margin` TOML options (no longer applicable to a popover).
+
 ## [0.1.0] - 2026-05-15
 
 ### Added

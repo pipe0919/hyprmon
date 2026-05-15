@@ -1,9 +1,7 @@
 # hyprmon configuration — copy to ~/.config/hyprmon/config.toml.
-# Edits are picked up live (no restart needed) except for `corner` and `margin`.
+# Edits are picked up live (no restart needed).
 
 # --- panel ---
-corner       = "top-right"   # top-right | top-left | bottom-right | bottom-left
-margin       = 12             # pixels from the screen edge
 opacity      = 0.85           # 0.0 (transparent) to 1.0 (solid)
 accent       = "#7AA2F7"      # hex color, used for the small charging ⚡ icon
 

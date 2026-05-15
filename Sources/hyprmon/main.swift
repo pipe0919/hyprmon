@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import HyprmonCore
 
-let VERSION = "0.1.0"
+let VERSION = "0.2.0"
 
 let args = CommandLine.arguments
 if args.contains("--version") {
@@ -37,9 +37,6 @@ try? FileManager.default.createDirectory(atPath: configDir, withIntermediateDire
 if !FileManager.default.fileExists(atPath: configPath) {
     let defaults = """
     # ~/.config/hyprmon/config.toml — auto-generated defaults
-    corner       = "top-right"
-    margin       = 12
-    opacity      = 0.85
     accent       = "#7AA2F7"
     refresh_ms   = 1000
     claude_refresh_ms = 30000
@@ -67,7 +64,7 @@ let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
 
 @MainActor final class Holder {
-    var panel: DesktopPanel?
+    var controller: MenuBarController?
     let system = SystemSampler()
     let claude = ClaudeMonitor()
     let loader: ConfigLoader
@@ -84,38 +81,29 @@ let nonactorLoader = try ConfigLoader(path: configPath)
 func runApp(loader: ConfigLoader) {
     let holder = Holder(loader: loader)
 
-    func rebuildPanel() {
-        let theme = Theme(
-            accent: Color(hexString: holder.cfg.accentHex) ?? Theme.default.accent,
-            opacity: holder.cfg.opacity
+    func makeTheme(_ cfg: Config) -> Theme {
+        Theme(
+            accent: Color(hexString: cfg.accentHex) ?? Theme.default.accent,
+            opacity: cfg.opacity
         )
-        let content = ContentView(system: holder.system, claude: holder.claude, cfg: holder.cfg, theme: theme)
-        if holder.panel == nil {
-            holder.panel = DesktopPanel(content: content, cfg: holder.cfg)
-            holder.panel?.orderFront(nil)
-        } else {
-            holder.panel?.applyConfig(holder.cfg)
-            holder.panel?.positionFor(corner: holder.cfg.corner, margin: CGFloat(holder.cfg.margin))
-            if let effect = holder.panel?.contentView as? NSVisualEffectView,
-               let host = effect.subviews.compactMap({ $0 as? NSHostingView<ContentView> }).first {
-                host.rootView = content
-            }
-        }
     }
+
+    let theme = makeTheme(holder.cfg)
+    let controller = MenuBarController(system: holder.system, claude: holder.claude, cfg: holder.cfg, theme: theme)
+    holder.controller = controller
 
     loader.onChange = { newCfg in
         Task { @MainActor in
             holder.cfg = newCfg
             holder.system.start(intervalMs: newCfg.refreshMs, processCount: newCfg.processes.count)
             holder.claude.start(intervalMs: newCfg.claudeRefreshMs, plan: newCfg.claude.plan, claudeCfg: newCfg.claude)
-            rebuildPanel()
+            controller.updateConfig(newCfg, theme: makeTheme(newCfg))
         }
     }
     loader.startWatching()
 
     holder.system.start(intervalMs: holder.cfg.refreshMs, processCount: holder.cfg.processes.count)
     holder.claude.start(intervalMs: holder.cfg.claudeRefreshMs, plan: holder.cfg.claude.plan, claudeCfg: holder.cfg.claude)
-    rebuildPanel()
 }
 
 Task { @MainActor in
