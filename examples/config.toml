@@ -20,7 +20,7 @@ claude    = true
 # --- top processes ---
 [processes]
 count   = 5
-sort_by = "cpu"               # cpu | ram
+sort_by = "cpu"               # cpu | ram | energy
 
 # --- Claude usage ---
 [claude]

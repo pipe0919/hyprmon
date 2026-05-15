@@ -8,6 +8,7 @@ versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - **Replaced desktop-level panel with a menubar item.** The widget now lives in the macOS menubar as a small chart icon; click it to toggle a popover with all metrics. The previous desktop-level NSPanel was useless because windows kept covering it.
+- **Top Processes** can now be sorted by CPU, RAM, or Energy (interrupt + idle wakeups, similar to Activity Monitor's Energy column). Toggle with the segmented control in the popover; default comes from `processes.sort_by` in `config.toml` (`cpu` | `ram` | `energy`).
 
 ### Removed
 - `corner` and `margin` TOML options (no longer applicable to a popover).

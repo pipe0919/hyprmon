@@ -7,6 +7,22 @@ struct ContentView: View {
     let cfg: Config
     let theme: Theme
 
+    @State private var sortKey: ProcessSampler.SortKey
+
+    init(system: SystemSampler, claude: ClaudeMonitor, cfg: Config, theme: Theme) {
+        self.system = system
+        self.claude = claude
+        self.cfg = cfg
+        self.theme = theme
+        let initial: ProcessSampler.SortKey
+        switch cfg.processes.sortBy {
+        case .cpu:    initial = .cpu
+        case .ram:    initial = .ram
+        case .energy: initial = .energy
+        }
+        _sortKey = State(initialValue: initial)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             SectionHeader(title: "HYPRMON", theme: theme)
@@ -30,8 +46,23 @@ struct ContentView: View {
 
             if cfg.modules.processes, !system.topProcs.isEmpty {
                 Divider().background(theme.surface)
-                SectionHeader(title: "Top Processes", theme: theme)
-                ProcessTable(procs: system.topProcs, theme: theme)
+                HStack {
+                    SectionHeader(title: "Top Processes", theme: theme)
+                    Spacer()
+                    Picker("", selection: $sortKey) {
+                        Text("CPU").tag(ProcessSampler.SortKey.cpu)
+                        Text("RAM").tag(ProcessSampler.SortKey.ram)
+                        Text("Energy").tag(ProcessSampler.SortKey.energy)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .controlSize(.mini)
+                    .fixedSize()
+                    .onChange(of: sortKey) { _, newValue in
+                        system.setSortKey(newValue)
+                    }
+                }
+                ProcessTable(procs: system.topProcs, sortKey: sortKey, theme: theme)
             }
 
             if cfg.modules.claude {
@@ -41,6 +72,6 @@ struct ContentView: View {
             }
         }
         .padding(16)
-        .frame(width: 320, alignment: .leading)
+        .frame(width: 340, alignment: .leading)
     }
 }

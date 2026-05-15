@@ -4,8 +4,6 @@ import XCTest
 final class ConfigTests: XCTestCase {
     func testDecodeFullConfig() throws {
         let toml = """
-        corner = "bottom-left"
-        margin = 20
         opacity = 0.7
         accent = "#FF0000"
         refresh_ms = 2000
@@ -28,8 +26,6 @@ final class ConfigTests: XCTestCase {
         show_weekly = true
         """
         let cfg = try Config.decode(from: TOMLParser.parse(toml))
-        XCTAssertEqual(cfg.corner, .bottomLeft)
-        XCTAssertEqual(cfg.margin, 20)
         XCTAssertEqual(cfg.opacity, 0.7)
         XCTAssertEqual(cfg.accentHex, "#FF0000")
         XCTAssertEqual(cfg.refreshMs, 2000)
@@ -46,7 +42,6 @@ final class ConfigTests: XCTestCase {
     func testDecodeUsesDefaultsForMissingKeys() throws {
         let cfg = try Config.decode(from: TOMLParser.parse("opacity = 0.5"))
         XCTAssertEqual(cfg.opacity, 0.5)
-        XCTAssertEqual(cfg.corner, .topRight)
         XCTAssertEqual(cfg.refreshMs, 1000)
     }
 

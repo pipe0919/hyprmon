@@ -88,6 +88,14 @@ func runApp(loader: ConfigLoader) {
         )
     }
 
+    func mapSort(_ s: Config.ProcessSort) -> ProcessSampler.SortKey {
+        switch s {
+        case .cpu:    return .cpu
+        case .ram:    return .ram
+        case .energy: return .energy
+        }
+    }
+
     let theme = makeTheme(holder.cfg)
     let controller = MenuBarController(system: holder.system, claude: holder.claude, cfg: holder.cfg, theme: theme)
     holder.controller = controller
@@ -95,14 +103,14 @@ func runApp(loader: ConfigLoader) {
     loader.onChange = { newCfg in
         Task { @MainActor in
             holder.cfg = newCfg
-            holder.system.start(intervalMs: newCfg.refreshMs, processCount: newCfg.processes.count)
+            holder.system.start(intervalMs: newCfg.refreshMs, processCount: newCfg.processes.count, sortBy: mapSort(newCfg.processes.sortBy))
             holder.claude.start(intervalMs: newCfg.claudeRefreshMs, plan: newCfg.claude.plan, claudeCfg: newCfg.claude)
             controller.updateConfig(newCfg, theme: makeTheme(newCfg))
         }
     }
     loader.startWatching()
 
-    holder.system.start(intervalMs: holder.cfg.refreshMs, processCount: holder.cfg.processes.count)
+    holder.system.start(intervalMs: holder.cfg.refreshMs, processCount: holder.cfg.processes.count, sortBy: mapSort(holder.cfg.processes.sortBy))
     holder.claude.start(intervalMs: holder.cfg.claudeRefreshMs, plan: holder.cfg.claude.plan, claudeCfg: holder.cfg.claude)
 }
 

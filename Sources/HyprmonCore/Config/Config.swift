@@ -1,15 +1,8 @@
 import Foundation
 
 public struct Config: Equatable, Sendable {
-    public enum Corner: String, Sendable {
-        case topRight    = "top-right"
-        case topLeft     = "top-left"
-        case bottomRight = "bottom-right"
-        case bottomLeft  = "bottom-left"
-    }
-
     public enum ProcessSort: String, Sendable {
-        case cpu, ram
+        case cpu, ram, energy
     }
 
     public enum Plan: String, Sendable {
@@ -37,8 +30,6 @@ public struct Config: Equatable, Sendable {
         public var windowWeeklyTokens: Int? = nil
     }
 
-    public var corner: Corner = .topRight
-    public var margin: Int = 12
     public var opacity: Double = 0.85
     public var accentHex: String = "#7AA2F7"
     public var refreshMs: Int = 1000
@@ -56,8 +47,6 @@ public extension Config {
     static func decode(from dict: [String: Any]) throws -> Config {
         var c = Config()
 
-        if let s = dict["corner"] as? String, let v = Corner(rawValue: s) { c.corner = v }
-        if let v = dict["margin"]  as? Int    { c.margin = v }
         if let v = dict["opacity"] as? Double { c.opacity = v }
         if let v = dict["opacity"] as? Int    { c.opacity = Double(v) }
         if let v = dict["accent"]  as? String { c.accentHex = v }

@@ -16,12 +16,14 @@ public final class SystemSampler {
     private var timer: Timer?
     private var intervalMs: Int = 1000
     private var procCount: Int = 5
+    private var procSort: ProcessSampler.SortKey = .cpu
 
     public init() {}
 
-    public func start(intervalMs: Int, processCount: Int) {
+    public func start(intervalMs: Int, processCount: Int, sortBy: ProcessSampler.SortKey = .cpu) {
         self.intervalMs = intervalMs
         self.procCount = processCount
+        self.procSort = sortBy
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: Double(intervalMs) / 1000.0, repeats: true) { [weak self] _ in
             guard let self else { return }
@@ -35,10 +37,15 @@ public final class SystemSampler {
         timer = nil
     }
 
+    public func setSortKey(_ key: ProcessSampler.SortKey) {
+        procSort = key
+        topProcs = procS.sample(count: procCount, sortBy: key)
+    }
+
     private func tick() {
         if let v = cpuS.sample() { cpu = v }
         if let v = memS.sample() { ram = v.usedFraction }
         battery = batS.sample()
-        topProcs = procS.sample(count: procCount)
+        topProcs = procS.sample(count: procCount, sortBy: procSort)
     }
 }
