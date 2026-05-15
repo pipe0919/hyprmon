@@ -20,15 +20,18 @@ if [[ "${1:-}" == "--universal" ]]; then UNIVERSAL=true; fi
 if $UNIVERSAL; then
     echo "Building universal binary..."
     swift build -c release --triple arm64-apple-macos14.0
-    cp .build/arm64-apple-macos14.0/release/hyprmon "$BIN_DIR/hyprmon-arm64"
+    ARM_BIN="$(swift build -c release --triple arm64-apple-macos14.0 --show-bin-path)/hyprmon"
+    cp "$ARM_BIN" "$BIN_DIR/hyprmon-arm64"
     swift build -c release --triple x86_64-apple-macos14.0
-    cp .build/x86_64-apple-macos14.0/release/hyprmon "$BIN_DIR/hyprmon-x86_64"
+    X86_BIN="$(swift build -c release --triple x86_64-apple-macos14.0 --show-bin-path)/hyprmon"
+    cp "$X86_BIN" "$BIN_DIR/hyprmon-x86_64"
     lipo -create "$BIN_DIR/hyprmon-arm64" "$BIN_DIR/hyprmon-x86_64" -output "$BIN_DIR/hyprmon"
     rm "$BIN_DIR/hyprmon-arm64" "$BIN_DIR/hyprmon-x86_64"
 else
     echo "Building native..."
     swift build -c release
-    cp ".build/release/hyprmon" "$BIN_DIR/hyprmon"
+    NATIVE_BIN="$(swift build -c release --show-bin-path)/hyprmon"
+    cp "$NATIVE_BIN" "$BIN_DIR/hyprmon"
 fi
 
 cp Resources/Info.plist "$APP/Contents/Info.plist"
