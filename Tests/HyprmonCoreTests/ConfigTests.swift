@@ -21,7 +21,6 @@ final class ConfigTests: XCTestCase {
         sort_by = "ram"
 
         [claude]
-        plan = "max5"
         show_5h = false
         show_weekly = true
         """
@@ -34,7 +33,6 @@ final class ConfigTests: XCTestCase {
         XCTAssertFalse(cfg.modules.claude)
         XCTAssertEqual(cfg.processes.count, 3)
         XCTAssertEqual(cfg.processes.sortBy, .ram)
-        XCTAssertEqual(cfg.claude.plan, .max5)
         XCTAssertFalse(cfg.claude.show5h)
         XCTAssertTrue(cfg.claude.showWeekly)
     }
@@ -45,19 +43,15 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(cfg.refreshMs, 1000)
     }
 
-    func testDecodeCustomPlanLimits() throws {
+    func testDecodeClaudeShowFlags() throws {
         let toml = """
         [claude]
-        plan = "custom"
-
-        [claude.limits]
-        window_5h_tokens = 500000
-        window_weekly_tokens = 4000000
+        show_5h     = false
+        show_weekly = false
         """
         let cfg = try Config.decode(from: TOMLParser.parse(toml))
-        XCTAssertEqual(cfg.claude.plan, .custom)
-        XCTAssertEqual(cfg.claude.window5hTokens, 500_000)
-        XCTAssertEqual(cfg.claude.windowWeeklyTokens, 4_000_000)
+        XCTAssertFalse(cfg.claude.show5h)
+        XCTAssertFalse(cfg.claude.showWeekly)
     }
 
     func testLoadFromDiskReadsFile() throws {

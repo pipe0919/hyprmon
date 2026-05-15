@@ -8,6 +8,14 @@ struct ClaudeQuotaView: View {
 
     var body: some View {
         VStack(spacing: 6) {
+            if let err = monitor.lastError {
+                HStack {
+                    Text("Claude API: \(err)")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(theme.fgMuted)
+                    Spacer()
+                }
+            }
             if cfg.show5h {
                 MetricBar(
                     label: "5H",

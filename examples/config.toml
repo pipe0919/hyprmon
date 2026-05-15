@@ -11,7 +11,7 @@ accent       = "#7AA2F7"      # hex color, used for the small charging ⚡ icon
 
 # --- refresh rates ---
 refresh_ms        = 1000      # system metrics tick (default 1s)
-claude_refresh_ms = 30000     # claude usage tick (default 30s — JSONL scan is expensive)
+claude_refresh_ms = 60000     # claude usage tick (default 60s — remote API is rate-limited)
 
 # --- which sections to render ---
 [modules]
@@ -27,12 +27,11 @@ count   = 5
 sort_by = "cpu"               # cpu | ram | energy
 
 # --- Claude usage ---
+# Reads your real usage from Anthropic's OAuth API (the same endpoint
+# Claude Code itself queries). The token is auto-discovered from your
+# macOS Keychain or ~/.claude/.credentials.json — no setup needed if
+# you've run `claude login`. If no token is found, the Claude section
+# auto-hides.
 [claude]
-plan        = "max20"         # pro | max5 | max20 | custom
 show_5h     = true
-show_weekly = true            # auto-hidden for `pro` plan (no documented weekly cap)
-
-# Only if plan = "custom":
-# [claude.limits]
-# window_5h_tokens     = 880000
-# window_weekly_tokens = 6000000
+show_weekly = true

@@ -4,23 +4,34 @@ import Observation
 @MainActor
 @Observable
 public final class ClaudeMonitor {
-    public private(set) var tokens5h: Int = 0
-    public private(set) var tokensWeekly: Int = 0
-    public private(set) var resetAt5h: Date?
-    public private(set) var resetAtWeekly: Date?
-    public private(set) var limits: PlanLimits = .init(window5h: 880_000, weekly: 6_000_000)
+    public private(set) var fiveHour: ClaudeUsageWindow?
+    public private(set) var weekly:   ClaudeUsageWindow?
+    public private(set) var plan: String = "Unknown"
+    public private(set) var lastError: String?
+    public private(set) var isReachable: Bool = false
 
-    private let reader: ClaudeUsageReader
+    private let client = ClaudeAPIClient()
     private var timer: Timer?
+    private var fetchTask: Task<Void, Never>?
 
-    public init(reader: ClaudeUsageReader = .init()) {
-        self.reader = reader
+    public init() {}
+
+    public var isAvailable: Bool { ClaudeCredentials.isAvailable }
+
+    public var fraction5h: Double {
+        guard let f = fiveHour else { return 0 }
+        return min(max(f.utilization / 100.0, 0), 1)
     }
 
-    public var isAvailable: Bool { reader.isAvailable }
+    public var fractionWeekly: Double? {
+        guard let w = weekly else { return nil }
+        return min(max(w.utilization / 100.0, 0), 1)
+    }
 
-    public func start(intervalMs: Int, plan: Config.Plan, claudeCfg: Config.ClaudeOpts) {
-        limits = PlanLimits.forPlan(plan, custom: claudeCfg)
+    public var resetAt5h: Date? { fiveHour?.resetsAt }
+    public var resetAtWeekly: Date? { weekly?.resetsAt }
+
+    public func start(intervalMs: Int) {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: Double(intervalMs) / 1000.0, repeats: true) { [weak self] _ in
             guard let self else { return }
@@ -29,24 +40,38 @@ public final class ClaudeMonitor {
         tick()
     }
 
-    public func stop() { timer?.invalidate(); timer = nil }
-
-    public var fraction5h: Double {
-        guard limits.window5h > 0 else { return 0 }
-        return min(Double(tokens5h) / Double(limits.window5h), 1.0)
-    }
-
-    public var fractionWeekly: Double? {
-        guard let w = limits.weekly, w > 0 else { return nil }
-        return min(Double(tokensWeekly) / Double(w), 1.0)
+    public func stop() {
+        timer?.invalidate(); timer = nil
+        fetchTask?.cancel(); fetchTask = nil
     }
 
     private func tick() {
-        let now = Date()
-        let snap = reader.read(asOf: now)
-        tokens5h     = snap.window5h.totalTokens(asOf: now)
-        tokensWeekly = snap.weekly.totalTokens(asOf: now)
-        resetAt5h     = snap.window5h.resetDate(asOf: now)
-        resetAtWeekly = snap.weekly.resetDate(asOf: now)
+        fetchTask?.cancel()
+        fetchTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.refresh()
+        }
+    }
+
+    private func refresh() async {
+        guard let token = ClaudeCredentials.loadToken() else {
+            self.lastError = "no token"
+            self.isReachable = false
+            return
+        }
+        do {
+            let usage = try await client.fetch(token: token)
+            self.fiveHour = usage.fiveHour
+            self.weekly = usage.weekly
+            self.plan = usage.plan
+            self.lastError = nil
+            self.isReachable = true
+        } catch let error as ClaudeAPIError {
+            self.lastError = error.description
+            self.isReachable = false
+        } catch {
+            self.lastError = error.localizedDescription
+            self.isReachable = false
+        }
     }
 }

@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import HyprmonCore
 
-let VERSION = "0.3.0"
+let VERSION = "0.4.0"
 
 let args = CommandLine.arguments
 if args.contains("--version") {
@@ -39,7 +39,7 @@ if !FileManager.default.fileExists(atPath: configPath) {
     # ~/.config/hyprmon/config.toml — auto-generated defaults
     accent       = "#7AA2F7"
     refresh_ms   = 1000
-    claude_refresh_ms = 30000
+    claude_refresh_ms = 60000
 
     [modules]
     cpu       = true
@@ -53,7 +53,6 @@ if !FileManager.default.fileExists(atPath: configPath) {
     sort_by = "cpu"
 
     [claude]
-    plan        = "max20"
     show_5h     = true
     show_weekly = true
     """
@@ -110,14 +109,14 @@ func runApp(loader: ConfigLoader) {
         Task { @MainActor in
             holder.cfg = newCfg
             holder.system.start(intervalMs: newCfg.refreshMs, processCount: newCfg.processes.count, sortBy: mapSort(newCfg.processes.sortBy))
-            holder.claude.start(intervalMs: newCfg.claudeRefreshMs, plan: newCfg.claude.plan, claudeCfg: newCfg.claude)
+            holder.claude.start(intervalMs: newCfg.claudeRefreshMs)
             controller.updateConfig(newCfg, theme: makeTheme(newCfg))
         }
     }
     loader.startWatching()
 
     holder.system.start(intervalMs: holder.cfg.refreshMs, processCount: holder.cfg.processes.count, sortBy: mapSort(holder.cfg.processes.sortBy))
-    holder.claude.start(intervalMs: holder.cfg.claudeRefreshMs, plan: holder.cfg.claude.plan, claudeCfg: holder.cfg.claude)
+    holder.claude.start(intervalMs: holder.cfg.claudeRefreshMs)
 }
 
 Task { @MainActor in

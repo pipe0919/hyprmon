@@ -5,10 +5,6 @@ public struct Config: Equatable, Sendable {
         case cpu, ram, energy
     }
 
-    public enum Plan: String, Sendable {
-        case pro, max5, max20, custom
-    }
-
     public struct Modules: Equatable, Sendable {
         public var cpu = true
         public var ram = true
@@ -23,17 +19,14 @@ public struct Config: Equatable, Sendable {
     }
 
     public struct ClaudeOpts: Equatable, Sendable {
-        public var plan: Plan = .max20
         public var show5h = true
         public var showWeekly = true
-        public var window5hTokens: Int? = nil
-        public var windowWeeklyTokens: Int? = nil
     }
 
     public var opacity: Double = 0.85
     public var accentHex: String = "#7AA2F7"
     public var refreshMs: Int = 1000
-    public var claudeRefreshMs: Int = 30_000
+    public var claudeRefreshMs: Int = 60_000
     public var modules = Modules()
     public var processes = ProcessOpts()
     public var claude = ClaudeOpts()
@@ -67,13 +60,8 @@ public extension Config {
         }
 
         if let cl = dict["claude"] as? [String: Any] {
-            if let s = cl["plan"] as? String, let v = Plan(rawValue: s) { c.claude.plan = v }
             if let v = cl["show_5h"]     as? Bool { c.claude.show5h = v }
             if let v = cl["show_weekly"] as? Bool { c.claude.showWeekly = v }
-            if let limits = cl["limits"] as? [String: Any] {
-                if let v = limits["window_5h_tokens"]     as? Int { c.claude.window5hTokens = v }
-                if let v = limits["window_weekly_tokens"] as? Int { c.claude.windowWeeklyTokens = v }
-            }
         }
         return c
     }

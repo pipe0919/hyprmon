@@ -35,22 +35,18 @@ Common tweaks:
 ```toml
 opacity = 0.7
 accent  = "#F7768E"
-
-[claude]
-plan = "max5"          # pro | max5 | max20 | custom
 ```
 
 You can also pick a theme without editing TOML — right-click the menubar icon → `Theme`.
 
-For `claude.plan = "custom"`:
+The Claude section auto-detects your plan and reads exact usage from Anthropic's OAuth API. The token is auto-discovered from your macOS Keychain or `~/.claude/.credentials.json` — no manual setup if you've run `claude login`.
+
+To toggle visibility of the 5-hour or weekly bars:
 
 ```toml
 [claude]
-plan = "custom"
-
-[claude.limits]
-window_5h_tokens     = 500000
-window_weekly_tokens = 4000000
+show_5h     = true
+show_weekly = true
 ```
 
 ## What gets measured
@@ -61,7 +57,7 @@ window_weekly_tokens = 4000000
 | RAM % | `host_statistics64(HOST_VM_INFO64)`, `(wired+active+compressed)/total` |
 | Battery | `IOPowerSources` framework |
 | Top processes | `proc_listpids` + `proc_pid_taskinfo`, aggregated by executable name |
-| Claude 5h / weekly | Sum of tokens from `~/.claude/projects/**/*.jsonl` over rolling windows |
+| Claude 5h / weekly | Anthropic's OAuth usage API (`/api/oauth/usage`) — exact utilization from your subscription |
 
 ## Requirements
 

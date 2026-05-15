@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-05-15
+
+### Changed
+- **Claude usage is now read from Anthropic's OAuth usage API** (the same endpoint Claude Code itself uses) instead of approximated from local JSONL token counts. Numbers are now exact percentages of your plan window, with the real reset time. Default refresh interval is 60 s (was 30 s) because the API is rate-limited.
+- The plan (`Pro` / `Max`) is auto-detected from the API response; the `[claude].plan` and `[claude.limits]` TOML options are gone.
+
+### Removed
+- `RollingWindow.swift`, `ClaudeUsageReader.swift`, `PlanLimits.swift` (all replaced by `ClaudeAPIClient.swift`).
+- `[claude].plan`, `[claude.limits.window_5h_tokens]`, `[claude.limits.window_weekly_tokens]` config keys.
+
+### How auth works
+Token is auto-discovered: `CLAUDE_TOKEN` env var → macOS Keychain (`Claude Code-credentials`) → `~/.claude/.credentials.json`. If you've run `claude login`, it works with no extra setup.
+
 ## [0.3.0] - 2026-05-15
 
 ### Added
