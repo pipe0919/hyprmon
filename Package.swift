@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "hyprmon",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v14)],
     products: [
         .executable(name: "hyprmon", targets: ["hyprmon"]),
         .library(name: "HyprmonCore", targets: ["HyprmonCore"]),
