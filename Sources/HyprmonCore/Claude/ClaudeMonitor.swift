@@ -21,7 +21,8 @@ public final class ClaudeMonitor {
         limits = PlanLimits.forPlan(plan, custom: claudeCfg)
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: Double(intervalMs) / 1000.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.tick() }
+            guard let self else { return }
+            Task { @MainActor in self.tick() }
         }
         tick()
     }
