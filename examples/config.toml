@@ -1,0 +1,36 @@
+# hyprmon configuration — copy to ~/.config/hyprmon/config.toml.
+# Edits are picked up live (no restart needed) except for `corner` and `margin`.
+
+# --- panel ---
+corner       = "top-right"   # top-right | top-left | bottom-right | bottom-left
+margin       = 12             # pixels from the screen edge
+opacity      = 0.85           # 0.0 (transparent) to 1.0 (solid)
+accent       = "#7AA2F7"      # hex color, used for the small charging ⚡ icon
+
+# --- refresh rates ---
+refresh_ms        = 1000      # system metrics tick (default 1s)
+claude_refresh_ms = 30000     # claude usage tick (default 30s — JSONL scan is expensive)
+
+# --- which sections to render ---
+[modules]
+cpu       = true
+ram       = true
+battery   = true              # ignored on desktop Macs without a battery
+processes = true
+claude    = true
+
+# --- top processes ---
+[processes]
+count   = 5
+sort_by = "cpu"               # cpu | ram
+
+# --- Claude usage ---
+[claude]
+plan        = "max20"         # pro | max5 | max20 | custom
+show_5h     = true
+show_weekly = true            # auto-hidden for `pro` plan (no documented weekly cap)
+
+# Only if plan = "custom":
+# [claude.limits]
+# window_5h_tokens     = 880000
+# window_weekly_tokens = 6000000
