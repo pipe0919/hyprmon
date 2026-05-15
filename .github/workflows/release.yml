@@ -25,7 +25,12 @@ jobs:
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
           NAME="hyprmon-${VERSION}.tar.gz"
-          tar -C build -czf "$NAME" Hyprmon.app
+          # Wrap Hyprmon.app inside hyprmon-VERSION/ so Homebrew does not
+          # auto-cd into the .app bundle on extract.
+          STAGE="/tmp/hyprmon-pkg-${VERSION}"
+          rm -rf "$STAGE" && mkdir -p "$STAGE/hyprmon-${VERSION}"
+          cp -R build/Hyprmon.app "$STAGE/hyprmon-${VERSION}/"
+          tar -C "$STAGE" -czf "$NAME" "hyprmon-${VERSION}"
           SHA=$(shasum -a 256 "$NAME" | awk '{print $1}')
           echo "name=$NAME"  >> "$GITHUB_OUTPUT"
           echo "sha=$SHA"    >> "$GITHUB_OUTPUT"
@@ -45,8 +50,8 @@ jobs:
             depends_on macos: :sonoma
 
             def install
-              prefix.install "Hyprmon.app"
-              bin.write_exec_script "#{prefix}/Hyprmon.app/Contents/MacOS/hyprmon"
+              prefix.install Dir["Hyprmon.app"]
+              bin.write_exec_script prefix/"Hyprmon.app/Contents/MacOS/hyprmon"
             end
 
             def caveats
@@ -56,11 +61,14 @@ jobs:
 
                 Configuration file:
                   ~/.config/hyprmon/config.toml
+
+                To open the widget:
+                  open -a "#{opt_prefix}/Hyprmon.app"
               CAVEATS
             end
 
             test do
-              system "#{bin}/hyprmon", "--version"
+              system bin/"hyprmon", "--version"
             end
           end
           EOF

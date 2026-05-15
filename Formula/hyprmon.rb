@@ -10,11 +10,11 @@ class Hyprmon < Formula
   depends_on macos: :sonoma
 
   def install
-    prefix.install "Hyprmon.app"
-    bin.write_exec_script "#{prefix}/Hyprmon.app/Contents/MacOS/hyprmon"
+    prefix.install Dir["Hyprmon.app"]
+    bin.write_exec_script prefix/"Hyprmon.app/Contents/MacOS/hyprmon"
   end
 
   test do
-    system "#{bin}/hyprmon", "--version"
+    system bin/"hyprmon", "--version"
   end
 end
