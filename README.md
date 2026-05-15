@@ -13,11 +13,7 @@ brew install pipe0919/tap/hyprmon
 open -a Hyprmon
 ```
 
-To start at login:
-
-```bash
-hyprmon --install-agent
-```
+hyprmon installs a LaunchAgent automatically on first launch so it comes back after reboot. Right-click the menubar icon → `Launch at Login` to toggle off, or run `hyprmon --uninstall-agent`.
 
 ### From source
 
@@ -43,6 +39,8 @@ accent  = "#F7768E"
 [claude]
 plan = "max5"          # pro | max5 | max20 | custom
 ```
+
+You can also pick a theme without editing TOML — right-click the menubar icon → `Theme`.
 
 For `claude.plan = "custom"`:
 

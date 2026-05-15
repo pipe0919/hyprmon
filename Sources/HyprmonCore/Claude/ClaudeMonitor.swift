@@ -17,6 +17,8 @@ public final class ClaudeMonitor {
         self.reader = reader
     }
 
+    public var isAvailable: Bool { reader.isAvailable }
+
     public func start(intervalMs: Int, plan: Config.Plan, claudeCfg: Config.ClaudeOpts) {
         limits = PlanLimits.forPlan(plan, custom: claudeCfg)
         timer?.invalidate()

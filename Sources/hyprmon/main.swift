@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import HyprmonCore
 
-let VERSION = "0.2.0"
+let VERSION = "0.3.0"
 
 let args = CommandLine.arguments
 if args.contains("--version") {
@@ -97,7 +97,13 @@ func runApp(loader: ConfigLoader) {
     }
 
     let theme = makeTheme(holder.cfg)
-    let controller = MenuBarController(system: holder.system, claude: holder.claude, cfg: holder.cfg, theme: theme)
+    let controller = MenuBarController(system: holder.system, claude: holder.claude, cfg: holder.cfg, theme: theme, configPath: loader.path)
+
+    // Auto-install LaunchAgent on first run so the widget starts at login by default.
+    // The user can opt out from the right-click menu.
+    if !LaunchAgent.isInstalled {
+        try? LaunchAgent.install()
+    }
     holder.controller = controller
 
     loader.onChange = { newCfg in

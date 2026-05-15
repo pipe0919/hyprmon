@@ -8,10 +8,30 @@ enum LaunchAgent {
         return "\(home)/Library/LaunchAgents/\(label).plist"
     }
 
-    static func install(binaryPath: String) throws {
+    static var isInstalled: Bool {
+        FileManager.default.fileExists(atPath: plistPath)
+    }
+
+    /// Returns the binary path to register with launchctl.
+    /// Prefers the Homebrew bin symlink when running from a Cellar path
+    /// so upgrades to a new version do not break the agent.
+    static func stableBinaryPath() -> String {
+        let exe = Bundle.main.executablePath ?? CommandLine.arguments[0]
+        if exe.contains("/Cellar/hyprmon/") {
+            for candidate in ["/opt/homebrew/bin/hyprmon", "/usr/local/bin/hyprmon"] {
+                if FileManager.default.fileExists(atPath: candidate) {
+                    return candidate
+                }
+            }
+        }
+        return exe
+    }
+
+    static func install(binaryPath: String? = nil) throws {
+        let path = binaryPath ?? stableBinaryPath()
         let plist: [String: Any] = [
             "Label": label,
-            "ProgramArguments": [binaryPath],
+            "ProgramArguments": [path],
             "RunAtLoad": true,
             "KeepAlive": true,
             "StandardErrorPath":  "\(NSHomeDirectory())/Library/Logs/hyprmon.log",
@@ -21,8 +41,9 @@ enum LaunchAgent {
         let dir = (plistPath as NSString).deletingLastPathComponent
         try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
         try data.write(to: URL(fileURLWithPath: plistPath))
+        // bootstrap may fail if the agent is already loaded; that's fine.
         _ = shell(["/bin/launchctl", "bootstrap", "gui/\(getuid())", plistPath])
-        print("Installed LaunchAgent at \(plistPath)")
+        NSLog("hyprmon: LaunchAgent installed at \(plistPath) → \(path)")
     }
 
     static func uninstall() throws {
@@ -30,7 +51,7 @@ enum LaunchAgent {
         if FileManager.default.fileExists(atPath: plistPath) {
             try FileManager.default.removeItem(atPath: plistPath)
         }
-        print("Uninstalled LaunchAgent")
+        NSLog("hyprmon: LaunchAgent uninstalled")
     }
 
     @discardableResult

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-05-15
+
+### Added
+- **Auto-start at login.** First launch installs a LaunchAgent so hyprmon comes back after reboot. Toggle from the menubar item's right-click menu.
+- **Theme picker** in the right-click menu. Six presets (Blue, Pink, Green, Orange, Purple, Cyan) write the accent color to `config.toml` and apply live. Section headers now use the accent color so theme changes are immediately visible.
+- **`Open config file…`** entry in the right-click menu for power users.
+
+### Changed
+- **Claude section auto-hides** if Claude Code is not installed (i.e. `~/.claude/projects/` is missing).
+- LaunchAgent now points to the stable Homebrew bin symlink (`/opt/homebrew/bin/hyprmon`) when running from a Cellar path, so version upgrades don't break the agent.
+
 ## [0.2.0] - 2026-05-15
 
 ### Changed

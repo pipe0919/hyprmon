@@ -9,6 +9,6 @@ struct SectionHeader: View {
         Text(title.uppercased())
             .font(.system(size: 10, weight: .semibold))
             .tracking(1)
-            .foregroundStyle(theme.fgMuted)
+            .foregroundStyle(theme.accent)
     }
 }

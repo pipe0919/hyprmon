@@ -43,3 +43,20 @@ public extension Color {
         self.init(hex: v)
     }
 }
+
+public struct ThemePreset: Sendable, Equatable {
+    public let id: String      // stable key, e.g. "blue"
+    public let label: String   // human label, e.g. "Blue"
+    public let hex: String     // e.g. "#7AA2F7"
+}
+
+public extension Theme {
+    static let presets: [ThemePreset] = [
+        .init(id: "blue",   label: "Blue",   hex: "#7AA2F7"),
+        .init(id: "pink",   label: "Pink",   hex: "#F7768E"),
+        .init(id: "green",  label: "Green",  hex: "#9ECE6A"),
+        .init(id: "orange", label: "Orange", hex: "#FF9E64"),
+        .init(id: "purple", label: "Purple", hex: "#BB9AF7"),
+        .init(id: "cyan",   label: "Cyan",   hex: "#7DCFFF"),
+    ]
+}

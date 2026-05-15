@@ -65,7 +65,7 @@ struct ContentView: View {
                 ProcessTable(procs: system.topProcs, sortKey: sortKey, theme: theme)
             }
 
-            if cfg.modules.claude {
+            if cfg.modules.claude, claude.isAvailable {
                 Divider().background(theme.surface)
                 SectionHeader(title: "Claude", theme: theme)
                 ClaudeQuotaView(monitor: claude, cfg: cfg.claude, theme: theme)

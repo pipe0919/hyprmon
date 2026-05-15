@@ -1,5 +1,9 @@
 # hyprmon configuration — copy to ~/.config/hyprmon/config.toml.
 # Edits are picked up live (no restart needed).
+#
+# On first launch hyprmon installs a LaunchAgent so it starts at login.
+# Toggle this from the menubar item's right-click menu (Launch at Login).
+# To pick a theme: right-click the menubar icon → Theme.
 
 # --- panel ---
 opacity      = 0.85           # 0.0 (transparent) to 1.0 (solid)

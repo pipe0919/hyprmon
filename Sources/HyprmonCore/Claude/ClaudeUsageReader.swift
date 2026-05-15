@@ -25,6 +25,13 @@ public final class ClaudeUsageReader: @unchecked Sendable {
         self.root = root
     }
 
+    /// True when ~/.claude/projects/ exists (i.e. Claude Code is installed).
+    public var isAvailable: Bool {
+        let projects = root.appendingPathComponent("projects").path
+        var isDir: ObjCBool = false
+        return FileManager.default.fileExists(atPath: projects, isDirectory: &isDir) && isDir.boolValue
+    }
+
     public func read(asOf now: Date = Date()) -> ClaudeUsageSnapshot {
         let projects = root.appendingPathComponent("projects")
         let fm = FileManager.default
