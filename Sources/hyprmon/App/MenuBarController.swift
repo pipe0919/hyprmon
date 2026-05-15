@@ -14,6 +14,23 @@ final class MenuBarController: NSObject {
     private var hosting: NSHostingController<ContentView>
     private let configPath: String
 
+    /// Programmatic brand mark — three rounded vertical bars.
+    /// Template image so the menubar auto-tints it for light/dark mode.
+    static func brandIcon() -> NSImage {
+        let size = NSSize(width: 22, height: 22)
+        let image = NSImage(size: size, flipped: false) { _ in
+            NSColor.labelColor.setFill()
+            let bars: [(x: CGFloat, h: CGFloat)] = [(6, 8), (10.5, 14), (15, 11)]
+            for bar in bars {
+                let rect = NSRect(x: bar.x, y: 5, width: 3, height: bar.h)
+                NSBezierPath(roundedRect: rect, xRadius: 1, yRadius: 1).fill()
+            }
+            return true
+        }
+        image.isTemplate = true
+        return image
+    }
+
     init(system: SystemSampler,
          claude: ClaudeMonitor,
          cfg: Config,
@@ -32,7 +49,7 @@ final class MenuBarController: NSObject {
         super.init()
 
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "chart.bar.fill", accessibilityDescription: "hyprmon")
+            button.image = MenuBarController.brandIcon()
             button.image?.isTemplate = true
             button.action = #selector(buttonClicked(_:))
             button.target = self

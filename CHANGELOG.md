@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-05-15
+
+### Added
+- **Custom brand icon** — three rounded vertical bars. Used both as the menubar item (template, adapts to light/dark) and as the app icon (Tokyo-Night blue gradient). No more generic SF Symbol.
+- `scripts/generate-app-icon.swift` + `scripts/build-icns.sh` so the icon is regenerable.
+
 ## [0.4.0] - 2026-05-15
 
 ### Changed

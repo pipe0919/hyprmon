@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 import HyprmonCore
 
-let VERSION = "0.4.0"
+let VERSION = "0.5.0"
 
 let args = CommandLine.arguments
 if args.contains("--version") {

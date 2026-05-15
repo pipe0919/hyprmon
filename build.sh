@@ -35,6 +35,13 @@ else
 fi
 
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+
+# Ensure the app icon exists (generate it if missing) and copy into the bundle.
+if [ ! -f Resources/AppIcon.icns ]; then
+    echo "Generating AppIcon.icns..."
+    ./scripts/build-icns.sh
+fi
+cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 chmod +x "$BIN_DIR/hyprmon"
 
 codesign --force --sign - --deep "$APP" >/dev/null
